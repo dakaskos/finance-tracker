@@ -6,7 +6,7 @@
       variant="tonal"
       @click="dialog = true"
     >
-      Add account
+      Новый счет
     </v-btn>
     <v-dialog v-model="dialog" max-width="600">
       <v-form method="post" v-model="valid" action>

@@ -7,24 +7,36 @@
       </v-col>
     </v-row>
     <v-row>
+      <v-col class="border text-center" cols="4" v-for="account in accounts">
+        <h2>{{ account.name }} </h2>
+      </v-col>
+    </v-row>
+<!--    <v-row>-->
+<!--      <v-col cols="12">-->
+<!--        <TransactionFilter />-->
+<!--      </v-col>-->
+<!--    </v-row>-->
+    <v-row>
       <v-col cols="6">
         <TransactionsList
-          title="Income"
+          title="Расходы"
           :transactions="incomeTransactions"
           :categories="categories"
           :accounts="accounts"
           :type=1
           @update-income-transactions="getIncomeTransactions"
+          @update-balance="getAccounts"
         />
       </v-col>
       <v-col cols="6">
         <TransactionsList
-          title="Outcome"
+          title="Приходы"
           :transactions="outcomeTransactions"
           :categories="categories"
           :accounts="accounts"
           :type=-1
           @update-outcome-transactions="getOutcomeTransactions"
+          @update-balance="getAccounts"
         />
       </v-col>
     </v-row>
@@ -36,9 +48,11 @@ import axios from "axios";
 import TransactionsList from "@/components/TransactionsList.vue";
 import CategoryForm from "@/components/CategoryForm.vue";
 import AccountForm from "@/components/AccountForm.vue";
+import TransactionFilter from "@/components/TransactionFilter.vue";
 export default {
   name: "BudgetList",
   components: {
+    TransactionFilter,
     AccountForm,
     TransactionsList,
     CategoryForm,
@@ -63,8 +77,8 @@ export default {
         .get("http://127.0.0.1:8000/api/transaction/", {
           params: {
             user: 1, // TODO: replace with the logged-in user
-            type: 1,
-            ordering: "-created_at",
+            type: 1, // TODO: replace with constant
+            ordering: "-date,-id",
           },
         })
         .then((response) => {
@@ -81,8 +95,8 @@ export default {
         .get("http://127.0.0.1:8000/api/transaction/", {
           params: {
             user: 1, // TODO: replace with the logged-in user
-            type: -1,
-            ordering: "-created_at",
+            type: -1, // TODO: replace with constant
+            ordering: "-date,-id",
           },
         })
         .then((response) => {
@@ -115,10 +129,11 @@ export default {
         },
       })
       .then((response) => {
+        this.accounts = [];
         for (let account of response.data) {
           this.accounts.push({
             id: account.id,
-            name: account.balance + " " + account.currency + " " + (account.is_cash ? "Cash" : "Bank"),
+            name: account.balance + " " + account.currency + " " + (account.is_cash ? "Наличка" : "Счет"),
           });
         }
       })

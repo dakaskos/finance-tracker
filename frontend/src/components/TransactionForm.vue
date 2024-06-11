@@ -6,17 +6,17 @@
       variant="tonal"
       @click="dialog = true"
     >
-      Add
+      Добавить
     </v-btn>
     <v-dialog v-model="dialog" max-width="600">
       <v-form method="post" v-model="valid" action>
-        <v-card prepend-icon="mdi-cash" title="Add">
+        <v-card prepend-icon="mdi-cash" title="Добавить">
           <v-card-text>
             <v-row dense>
               <v-col cols="12" md="4" sm="6">
                 <v-autocomplete
                   v-model="transactionForm.category"
-                  label="Category"
+                  label="Категория"
                   :items="categories"
                   item-title="name"
                   item-value="id"
@@ -28,7 +28,7 @@
                   v-model="transactionForm.amount"
                   :counter="10"
                   :rules="positiveNumberRules"
-                  label="Amount"
+                  label="Сумма"
                   hide-details
                   type="number"
                   required
@@ -38,18 +38,25 @@
               <v-col cols="12" md="4" sm="6">
                 <v-select
                   v-model="transactionForm.account"
-                  label="Account"
+                  label="Счет"
                   :items="accounts"
                   item-title="name"
                   item-value="id"
-                  ></v-select>
+                ></v-select>
               </v-col>
             </v-row>
             <v-row dense>
-              <v-col cols="12" md="12" sm="12">
+              <v-col cols="12" md="6" sm="6">
                 <v-text-field
                   v-model="transactionForm.description"
-                  label="Description"
+                  label="Описание"
+                  hide-details
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" md="6" sm="6">
+                <v-text-field
+                  v-model="transactionForm.date"
+                  label="Дата"
                   hide-details
                 ></v-text-field>
               </v-col>
@@ -66,7 +73,7 @@
               @click="submitForm"
               :disabled="!valid"
             >
-              Save
+              Сохранить
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -93,6 +100,7 @@ export default {
       amount: null,
       account: null,
       description: null,
+      date: null,
     },
     positiveNumberRules: [
       (v) => !!v || "Amount is required",
@@ -102,38 +110,50 @@ export default {
   methods: {
     async submitForm() {
       try {
-          const response = await axios.post(
-            'http://127.0.0.1:8000/api/transaction/',
-            {
-              category: this.transactionForm.category,
-              amount: this.transactionForm.amount,
-              account: this.transactionForm.account,
-              description: this.transactionForm.description,
-              type: this.type,
-              user: 1, // TODO: replace with the logged-in user
-            }
-          );
-
-          this.transactionForm = {
-            category: null,
-            amount: null,
-            account: null,
-            description: null,
-          };
-
-          if (this.type === 1) {
-            console.log('Income transaction')
-            this.$emit('update-income-transactions')
-          } else {
-            console.log('Outcome transaction')
-            this.$emit('update-outcome-transactions');
+        const response = await axios.post(
+          'http://127.0.0.1:8000/api/transaction/',
+          {
+            category: this.transactionForm.category,
+            amount: this.transactionForm.amount,
+            account: this.transactionForm.account,
+            description: this.transactionForm.description,
+            type: this.type,
+            date: this.transactionForm.date,
+            user: 1, // TODO: replace with the logged-in user
           }
-          // this.dialog = false;
-        console.log('Response:', response.data);
-        } catch (error) {
-          console.error('Error:', error);
+        );
+
+        this.transactionForm = {
+          category: null,
+          amount: null,
+          account: this.transactionForm.account,
+          description: null,
+          date: this.transactionForm.date,
+        };
+
+        if (this.type === 1) {
+          console.log('Income transaction')
+          this.$emit('update-income-transactions')
+        } else {
+          console.log('Outcome transaction')
+          this.$emit('update-outcome-transactions');
         }
+
+        this.$emit('update-balance');
+
+        console.log('Response:', response.data);
+      } catch (error) {
+        console.error('Error:', error);
+      }
     },
   },
+  mounted() {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear() + 1;
+
+    this.transactionForm.date = yyyy + '-' + mm + '-' + dd;
+  }
 };
 </script>

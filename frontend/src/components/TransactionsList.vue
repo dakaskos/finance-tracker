@@ -9,6 +9,7 @@
         class="text-right"
         @update-income-transactions="updateIncomeTransactions"
         @update-outcome-transactions="updateOutcomeTransactions"
+        @update-balance="updateBalance"
       />
     </v-toolbar>
 
@@ -16,19 +17,19 @@
       <thead>
         <tr>
           <th class="text-left">
-            Date
+            Дата
           </th>
           <th class="text-left">
-            Amount
+            Сумма
           </th>
           <th class="text-left">
-            Currency
+            Валюта
           </th>
           <th class="text-left">
-            Description
+            Описание
           </th>
           <th class="text-left">
-            Category
+            Категория
           </th>
         </tr>
       </thead>
@@ -37,7 +38,7 @@
           v-for="transaction in transactions"
           :key="transaction.id"
         >
-          <td>{{ formatDate(transaction.created_at) }}</td>
+          <td>{{ formatDate(transaction.date) }}</td>
           <td>{{ transaction.amount }}</td>
           <td>{{ transaction.currency }} {{ isAccountCash(transaction) }}</td>
           <td>{{ transaction.description }}</td>
@@ -65,7 +66,7 @@ export default {
   },
   methods: {
     isAccountCash(transaction) {
-      return transaction.is_cash === 1 ? "Cash" : "Bank";
+      return transaction.is_cash === 1 ? "Наличка" : "Счет";
     },
     formatDate(date) {
       return moment(date).format("DD.MM.YY");
@@ -75,6 +76,9 @@ export default {
     },
     updateOutcomeTransactions() {
       this.$emit("update-outcome-transactions")
+    },
+    updateBalance() {
+      this.$emit("update-balance")
     },
   },
 };
