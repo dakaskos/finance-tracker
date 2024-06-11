@@ -17,7 +17,13 @@ class Transaction(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, default=None)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True, null=True)
-    category = models.ForeignKey("Category", on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        "Category",
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+    )
+    date = models.DateField()
     type = models.IntegerField(
         choices=[(tag.value, tag.name) for tag in TransactionType]
     )

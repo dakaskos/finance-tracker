@@ -7,8 +7,8 @@ from ..serializers.transaction import TransactionSerializer
 
 
 class TransactionFilter(rest_framework.FilterSet):
-    start_date = rest_framework.DateFilter(field_name='created_at', lookup_expr='gte')
-    end_date = rest_framework.DateFilter(field_name='created_at', lookup_expr='lte')
+    start_date = rest_framework.DateFilter(field_name='date', lookup_expr='gte')
+    end_date = rest_framework.DateFilter(field_name='date', lookup_expr='lte')
 
     class Meta:
         model = Transaction
@@ -24,4 +24,4 @@ class TransactionViewSet(viewsets.ModelViewSet):
         filters.SearchFilter,
     ]
     filterset_class = TransactionFilter
-    ordering_fields = ['created_at']
+    ordering_fields = ['date', 'id']

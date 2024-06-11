@@ -18,16 +18,7 @@ class TransactionSerializer(serializers.ModelSerializer):
     def validate(self, data: dict) -> dict:
         amount = data['amount']
         if amount <= 0:
-            raise serializers.ValidationError("Amount must be greater than zero.")
-
-        account = data['account']
-        transaction_type = data['type']
-
-        if (account.balance - amount < 0
-                and transaction_type == TransactionType.EXPENSE.value
-        ):
-            error_message = "Account balance must be greater than zero."
-            raise serializers.ValidationError(error_message)
+            raise serializers.ValidationError("Сумма должна быть больше нуля")
 
         return data
 
