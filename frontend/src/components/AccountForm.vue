@@ -10,7 +10,7 @@
     </v-btn>
     <v-dialog v-model="dialog" max-width="600">
       <v-form method="post" v-model="valid" action>
-        <v-card prepend-icon="mdi-bank" title="Add account">
+        <v-card prepend-icon="mdi-bank" title="Добавить счет">
           <v-card-text>
             <v-row dense>
               <v-col cols="12" md="4" sm="6">
@@ -18,7 +18,7 @@
                   v-model="accountForm.balance"
                   :counter="10"
                   :rules="positiveNumberRules"
-                  label="Amount"
+                  label="Сумма"
                   hide-details
                   type="number"
                   required
@@ -28,7 +28,7 @@
               <v-col cols="12" md="4" sm="6">
                 <v-select
                   v-model="accountForm.currency"
-                  label="Currency"
+                  label="Валюта"
                   :items="['USD', 'PLN', 'EUR']"
                   required></v-select>
               </v-col>
@@ -36,7 +36,7 @@
               <v-col cols="12" md="4" sm="6">
                 <v-checkbox
                   v-model="accountForm.is_cash"
-                  label="Is cash">
+                  label="Наличка">
                 </v-checkbox>
               </v-col>
             </v-row>
@@ -50,9 +50,8 @@
               color="primary"
               variant="tonal"
               @click="submitForm"
-              :disabled="!valid"
             >
-              Save
+              Сохранить
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -75,7 +74,7 @@ export default {
     },
     positiveNumberRules: [
       (v) => !!v || "Amount is required",
-      (v) => (v && v > 0) || "Amount must be greater than 0",
+      (v) => (v && v >= 0) || "Amount must be greater than 0",
     ],
   }),
   methods: {

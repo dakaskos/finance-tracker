@@ -9,7 +9,7 @@
   </v-btn>
   <v-dialog v-model="dialog" max-width="600">
     <v-form method="post" v-model="valid" action>
-      <v-card prepend-icon="mdi-folder" title="Add category">
+      <v-card prepend-icon="mdi-folder" title="Добавить категорию">
         <v-card-text>
           <v-row dense>
             <v-col cols="12" md="12" sm="12">
@@ -17,7 +17,7 @@
                 v-model="categoryForm.name"
                 :counter="10"
                 :rules="[v => !!v && v.length > 3 || 'Name is required']"
-                label="Name"
+                label="Название"
                 hide-details
                 required
               ></v-text-field>
@@ -35,7 +35,7 @@
             @click="submitForm"
             :disabled="!valid"
           >
-            Save
+            Сохранить
           </v-btn>
         </v-card-actions>
       </v-card>
