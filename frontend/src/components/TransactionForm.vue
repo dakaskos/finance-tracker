@@ -111,7 +111,7 @@ export default {
     async submitForm() {
       try {
         const response = await axios.post(
-          'http://127.0.0.1:8000/api/transaction/',
+          window.django_host + '/api/transaction/',
           {
             category: this.transactionForm.category,
             amount: this.transactionForm.amount,
@@ -151,7 +151,7 @@ export default {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear() + 1;
+    var yyyy = today.getFullYear();
 
     this.transactionForm.date = yyyy + '-' + mm + '-' + dd;
   }

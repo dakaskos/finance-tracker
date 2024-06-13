@@ -19,7 +19,7 @@
     <v-row>
       <v-col cols="6">
         <TransactionsList
-          title="Расходы"
+          title="Приходы"
           :transactions="incomeTransactions"
           :categories="categories"
           :accounts="accounts"
@@ -30,7 +30,7 @@
       </v-col>
       <v-col cols="6">
         <TransactionsList
-          title="Приходы"
+          title="Расходы"
           :transactions="outcomeTransactions"
           :categories="categories"
           :accounts="accounts"
@@ -74,7 +74,7 @@ export default {
     getIncomeTransactions() {
       console.log("getIncomeTransactions")
       axios
-        .get("http://127.0.0.1:8000/api/transaction/", {
+        .get(window.django_host + "/api/transaction/", {
           params: {
             user: 1, // TODO: replace with the logged-in user
             type: 1, // TODO: replace with constant
@@ -92,7 +92,7 @@ export default {
       console.log("getOutcomeTransactions")
       console.log(this.outcomeTransactions)
       axios
-        .get("http://127.0.0.1:8000/api/transaction/", {
+        .get(window.django_host + "/api/transaction/", {
           params: {
             user: 1, // TODO: replace with the logged-in user
             type: -1, // TODO: replace with constant
@@ -108,7 +108,7 @@ export default {
     },
     getCategories() {
       axios
-      .get("http://127.0.0.1:8000/api/category/", {
+      .get(window.django_host + "/api/category/", {
         params: {
           user: 1, // TODO: replace with the logged-in user
         },
@@ -123,7 +123,7 @@ export default {
     },
     getAccounts() {
       axios
-      .get("http://127.0.0.1:8000/api/account/", {
+      .get(window.django_host + "/api/account/", {
         params: {
           user: 1, // TODO: replace with the logged-in user
         },

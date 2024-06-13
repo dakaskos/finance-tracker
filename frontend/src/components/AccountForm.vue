@@ -82,7 +82,7 @@ export default {
     async submitForm() {
       try {
           const response = await axios.post(
-            'http://127.0.0.1:8000/api/account/',
+            window.django_host + '/api/account/',
             {
               currency: this.accountForm.currency,
               is_cash: this.accountForm.is_cash,
