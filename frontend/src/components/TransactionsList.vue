@@ -33,6 +33,7 @@
         <tr
           v-for="transaction in transactions"
           :key="transaction.id"
+          :class="currencyColor(transaction.currency)"
         >
           <td>{{ formatDate(transaction.date) }}</td>
           <td>{{ transaction.amount }}</td>
@@ -73,6 +74,15 @@ export default {
     },
     updateBalance() {
       this.$emit("update-balance")
+    },
+    currencyColor(currency) {
+      if (currency.includes("EUR")) {
+        return "bg-amber-lighten-4";
+      } else if (currency.includes("USD")) {
+        return "bg-light-green-lighten-4";
+      }
+
+      return "bg-grey-lighten-4";
     },
   },
 };
