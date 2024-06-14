@@ -12,7 +12,6 @@ class TransactionSerializer(serializers.ModelSerializer):
     type = fields.ChoiceField(
         choices=[(tag.value, tag.name) for tag in TransactionType]
     )
-    category_name = serializers.CharField(source='category.name', read_only=True)
     account_type = serializers.BooleanField(source='account.is_cash', read_only=True)
 
     def validate(self, data: dict) -> dict:

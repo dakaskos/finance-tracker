@@ -12,7 +12,7 @@ class TransactionFilter(rest_framework.FilterSet):
 
     class Meta:
         model = Transaction
-        fields = ['user', 'category', 'type', 'account', 'start_date', 'end_date']
+        fields = ['user', 'type', 'account', 'start_date', 'end_date']
 
 
 class TransactionViewSet(viewsets.ModelViewSet):

@@ -2,7 +2,6 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <CategoryForm @update-categories="getCategories" />
         <AccountForm @update-accounts="getAccounts" />
       </v-col>
     </v-row>
@@ -21,7 +20,6 @@
         <TransactionsList
           title="Приходы"
           :transactions="incomeTransactions"
-          :categories="categories"
           :accounts="accounts"
           :type=1
           @update-income-transactions="getIncomeTransactions"
@@ -32,7 +30,6 @@
         <TransactionsList
           title="Расходы"
           :transactions="outcomeTransactions"
-          :categories="categories"
           :accounts="accounts"
           :type=-1
           @update-outcome-transactions="getOutcomeTransactions"
@@ -46,7 +43,6 @@
 <script>
 import axios from "axios";
 import TransactionsList from "@/components/TransactionsList.vue";
-import CategoryForm from "@/components/CategoryForm.vue";
 import AccountForm from "@/components/AccountForm.vue";
 import TransactionFilter from "@/components/TransactionFilter.vue";
 export default {
@@ -55,17 +51,14 @@ export default {
     TransactionFilter,
     AccountForm,
     TransactionsList,
-    CategoryForm,
   },
 
   data: () => ({
     incomeTransactions: [],
     outcomeTransactions: [],
-    categories: [],
     accounts: [],
   }),
   mounted() {
-    this.getCategories();
     this.getIncomeTransactions();
     this.getOutcomeTransactions();
     this.getAccounts();
@@ -105,21 +98,6 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-    },
-    getCategories() {
-      axios
-      .get(window.django_host + "/api/category/", {
-        params: {
-          user: 1, // TODO: replace with the logged-in user
-        },
-      })
-      .then((response) => {
-        this.categories = response.data;
-        // this.categories = [...response.data.map((category) => category.name)];
-      })
-      .catch((error) => {
-        console.log(error);
-      });
     },
     getAccounts() {
       axios
