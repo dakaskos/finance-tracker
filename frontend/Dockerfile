@@ -1,4 +1,4 @@
-FROM  --platform=linux/amd64 node:16.14.0-alpine
+FROM  node:16-alpine
 
 RUN mkdir /app
 
@@ -12,4 +12,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-ENTRYPOINT ["npm", "run"]
+CMD ["npm", "run", "dev", "--", "--host=0.0.0.0"]
