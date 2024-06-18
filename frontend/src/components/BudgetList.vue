@@ -6,7 +6,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col class="border text-center" cols="4" v-for="account in accounts">
+      <v-col class="border text-center" :class="currencyColor(account.currency)" cols="4" v-for="account in accounts">
         <h2>{{ account.name }} </h2>
       </v-col>
     </v-row>
@@ -137,13 +137,30 @@ export default {
       })
       .then((response) => {
         this.accounts = [];
+        const currencyOrder = {
+          "PLN": 0,
+          "USD": 1,
+          "EUR": 2,
+        }
+
         for (let account of response.data) {
           this.accounts.push({
             id: account.id,
             name: this.formatNumber(account.balance) + " " + account.currency + " " + (account.is_cash ? "Наличка" : "Счет"),
             currency: account.currency + " " + (account.is_cash ? "Наличка" : "Счет"),
+            order: currencyOrder[account.currency],
           });
         }
+        // Accounts order by business requirements PLN, USD, EUR
+        this.accounts.sort((a, b) => {
+          if (a.order < b.order) {
+            return -1;
+          }
+          if (a.order > b.order) {
+            return 1;
+          }
+          return 0;
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -162,6 +179,15 @@ export default {
       if (mm < 10) mm = '0' + mm;
 
       return yyyy + '-' + mm + '-' + dd;
+    },
+    currencyColor(currency) {
+      if (currency.includes("EUR")) {
+        return "bg-amber-lighten-4";
+      } else if (currency.includes("USD")) {
+        return "bg-light-green-lighten-4";
+      }
+
+      return "bg-grey-lighten-4";
     },
   },
   watch: {
