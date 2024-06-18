@@ -8,6 +8,5 @@
 </template>
 
 <script setup>
-  //
 import BudgetList from "@/components/BudgetList.vue";
 </script>

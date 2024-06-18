@@ -14,8 +14,13 @@ import App from './App.vue'
 
 // Composables
 import { createApp } from 'vue'
+import {numberWithSpaces} from "@/filters/numberWithSpaces";
 
 const app = createApp(App)
+
+app.config.globalProperties.$filters = {
+  numberWithSpaces
+};
 
 registerPlugins(app)
 

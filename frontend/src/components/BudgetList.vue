@@ -10,11 +10,11 @@
         <h2>{{ account.name }} </h2>
       </v-col>
     </v-row>
-<!--    <v-row>-->
-<!--      <v-col cols="12">-->
-<!--        <TransactionFilter />-->
-<!--      </v-col>-->
-<!--    </v-row>-->
+    <v-row>
+      <v-col cols="12">
+        <TransactionFilter @update-period="updatePeriod" />
+      </v-col>
+    </v-row>
     <v-row>
       <v-col cols="6">
         <TransactionsList
@@ -57,22 +57,45 @@ export default {
     incomeTransactions: [],
     outcomeTransactions: [],
     accounts: [],
+    date_to: null,
+    date_from: null,
   }),
   mounted() {
+    const today = new Date();
+    let month_ago = new Date();
+    month_ago.setMonth(today.getMonth() - 1);
+    this.date_to = today
+    this.date_from = month_ago
+
     this.getIncomeTransactions();
     this.getOutcomeTransactions();
     this.getAccounts();
   },
   methods: {
+    updatePeriod(date_from, date_to) {
+      console.log(date_from)
+      console.log(date_to)
+      this.date_from = date_from;
+      this.date_to = date_to;
+      this.getIncomeTransactions();
+      this.getOutcomeTransactions();
+    },
     getIncomeTransactions() {
       console.log("getIncomeTransactions")
+      let params = {
+        user: 1, // TODO: replace with the logged-in user
+        type: 1, // TODO: replace with constant
+        ordering: "-date,-id",
+      };
+      if (this.date_from) {
+        params.start_date = this.formatDate(this.date_from);
+      }
+      if (this.date_to) {
+        params.end_date = this.formatDate(this.date_to);
+      }
       axios
         .get(window.django_host + "/api/transaction/", {
-          params: {
-            user: 1, // TODO: replace with the logged-in user
-            type: 1, // TODO: replace with constant
-            ordering: "-date,-id",
-          },
+          params: params,
         })
         .then((response) => {
           this.incomeTransactions = response.data;
@@ -83,14 +106,20 @@ export default {
     },
     getOutcomeTransactions() {
       console.log("getOutcomeTransactions")
-      console.log(this.outcomeTransactions)
+      let params = {
+        user: 1, // TODO: replace with the logged-in user
+        type: -1, // TODO: replace with constant
+        ordering: "-date,-id",
+      };
+      if (this.date_from) {
+        params.start_date = this.formatDate(this.date_from);
+      }
+      if (this.date_to) {
+        params.end_date = this.formatDate(this.date_to);
+      }
       axios
         .get(window.django_host + "/api/transaction/", {
-          params: {
-            user: 1, // TODO: replace with the logged-in user
-            type: -1, // TODO: replace with constant
-            ordering: "-date,-id",
-          },
+          params: params,
         })
         .then((response) => {
           this.outcomeTransactions = response.data;
@@ -111,14 +140,29 @@ export default {
         for (let account of response.data) {
           this.accounts.push({
             id: account.id,
-            name: account.balance + " " + account.currency + " " + (account.is_cash ? "Наличка" : "Счет"),
+            name: this.formatNumber(account.balance) + " " + account.currency + " " + (account.is_cash ? "Наличка" : "Счет"),
+            currency: account.currency + " " + (account.is_cash ? "Наличка" : "Счет"),
           });
         }
       })
       .catch((error) => {
         console.log(error);
       });
-    }
+    },
+    formatNumber(value) {
+      return this.$filters.numberWithSpaces(value);
+    },
+    formatDate(date) {
+      console.log("test=", date)
+      const yyyy = date.getFullYear();
+      let mm = date.getMonth() + 1; // Months start at 0!
+      let dd = date.getDate();
+
+      if (dd < 10) dd = '0' + dd;
+      if (mm < 10) mm = '0' + mm;
+
+      return yyyy + '-' + mm + '-' + dd;
+    },
   },
   watch: {
     incomeTransactions: function() {
@@ -126,6 +170,9 @@ export default {
     },
     outcomeTransactions: function() {
       console.log("Outcome transactions updated");
+    },
+    updatePeriod: function() {
+      console.log("Period updated");
     },
   },
 };

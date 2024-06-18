@@ -30,7 +30,7 @@
                   v-model="transactionForm.account"
                   label="Счет"
                   :items="accounts"
-                  item-title="name"
+                  item-title="currency"
                   item-value="id"
                 ></v-select>
               </v-col>

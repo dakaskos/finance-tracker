@@ -36,7 +36,7 @@
           :class="currencyColor(transaction.currency)"
         >
           <td>{{ formatDate(transaction.date) }}</td>
-          <td>{{ transaction.amount }}</td>
+          <td>{{ formatNumber(transaction.amount) }}</td>
           <td>{{ transaction.currency }} {{ isAccountCash(transaction) }}</td>
           <td>{{ transaction.description }}</td>
         </tr>
@@ -83,6 +83,9 @@ export default {
       }
 
       return "bg-grey-lighten-4";
+    },
+    formatNumber(value) {
+      return this.$filters.numberWithSpaces(value);
     },
   },
 };
