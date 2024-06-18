@@ -35,10 +35,10 @@
           :key="transaction.id"
           :class="currencyColor(transaction.currency)"
         >
-          <td>{{ formatDate(transaction.date) }}</td>
+          <td><strong>{{ formatDate(transaction.date) }}</strong></td>
           <td>{{ formatNumber(transaction.amount) }}</td>
           <td>{{ transaction.currency }} {{ isAccountCash(transaction) }}</td>
-          <td>{{ transaction.description }}</td>
+          <td><strong>{{ transaction.description }}</strong></td>
         </tr>
       </tbody>
     </v-table>

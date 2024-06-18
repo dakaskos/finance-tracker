@@ -8,7 +8,7 @@
     >
       Добавить
     </v-btn>
-    <v-dialog v-model="transactionFormDialog" max-width="600">
+    <v-dialog v-model="transactionFormDialog" max-width="600" style="bottom: -500px;">
       <v-form method="post" v-model="valid" action>
         <v-card prepend-icon="mdi-cash" title="Добавить">
           <v-card-text>

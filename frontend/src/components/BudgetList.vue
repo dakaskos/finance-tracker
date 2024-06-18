@@ -22,7 +22,7 @@
           :transactions="incomeTransactions"
           :accounts="accounts"
           :type=1
-          @update-income-transactions="getIncomeTransactions"
+          @update-income-transactions="getTransactions"
           @update-balance="getAccounts"
         />
       </v-col>
@@ -32,7 +32,7 @@
           :transactions="outcomeTransactions"
           :accounts="accounts"
           :type=-1
-          @update-outcome-transactions="getOutcomeTransactions"
+          @update-outcome-transactions="getTransactions"
           @update-balance="getAccounts"
         />
       </v-col>
@@ -67,8 +67,7 @@ export default {
     this.date_to = today
     this.date_from = month_ago
 
-    this.getIncomeTransactions();
-    this.getOutcomeTransactions();
+    this.getTransactions();
     this.getAccounts();
   },
   methods: {
@@ -77,8 +76,37 @@ export default {
       console.log(date_to)
       this.date_from = date_from;
       this.date_to = date_to;
-      this.getIncomeTransactions();
-      this.getOutcomeTransactions();
+      this.getTransactions();
+    },
+    getTransactions() {
+      this.incomeTransactions = [];
+      this.outcomeTransactions = [];
+      let params = {
+        user: 1, // TODO: replace with the logged-in user
+        ordering: "-date,-id",
+      };
+      if (this.date_from) {
+        params.start_date = this.formatDate(this.date_from);
+      }
+      if (this.date_to) {
+        params.end_date = this.formatDate(this.date_to);
+      }
+      axios
+        .get(window.django_host + "/api/transaction/", {
+          params: params,
+        })
+        .then((response) => {
+          response.data.forEach((transaction) => {
+            if (transaction.type === 1) {
+              this.incomeTransactions.push(transaction);
+            } else {
+              this.outcomeTransactions.push(transaction);
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     getIncomeTransactions() {
       console.log("getIncomeTransactions")
