@@ -13,19 +13,19 @@
     </v-toolbar>
 
     <v-table>
-      <thead>
+      <thead class="bg-blue-lighten-1">
         <tr>
           <th class="text-left">
-            Дата
+            <strong>Дата</strong>
           </th>
           <th class="text-left">
-            Сумма
+            <strong>Сумма</strong>
           </th>
           <th class="text-left">
-            Валюта
+            <strong>Валюта</strong>
           </th>
           <th class="text-left">
-            Описание
+            <strong>Описание</strong>
           </th>
         </tr>
       </thead>
