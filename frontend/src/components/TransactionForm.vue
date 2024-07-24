@@ -4,16 +4,20 @@
       color="primary"
       prepend-icon="mdi-plus"
       variant="tonal"
-      @click="transactionFormDialog = true"
+      @click="openDialog(null)"
     >
       Добавить
     </v-btn>
     <v-dialog v-model="transactionFormDialog" max-width="600" style="bottom: -500px;">
       <v-form method="post" v-model="valid" action>
-        <v-card prepend-icon="mdi-cash" title="Добавить">
+        <v-card prepend-icon="mdi-cash" :title=title>
           <v-card-text>
             <v-row dense>
               <v-col cols="12" md="6" sm="6">
+                <input
+                  v-model="transactionForm.id"
+                  type="hidden"
+                ></input>
                 <v-text-field
                   v-model="transactionForm.amount"
                   :counter="10"
@@ -68,12 +72,21 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
+              v-if = "transactionForm.id"
+              color="red-lighten-2"
+              variant="tonal"
+              @click="deleteTransaction"
+              :disabled="!valid"
+            >
+              Удалить
+            </v-btn>
+            <v-btn
               color="primary"
               variant="tonal"
               @click="submitForm"
               :disabled="!valid"
             >
-              Сохранить
+              Добавить
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -92,12 +105,14 @@ export default {
   props: {
     accounts: Array, // TODO: add type checking
     type: Number,
+    title: String,
   },
   data: () => ({
     transactionFormDialog: false,
     datePickerDialog: false,
     valid: false,
     transactionForm: {
+      id: null,
       amount: null,
       account: null,
       description: null,
@@ -110,6 +125,18 @@ export default {
     ],
   }),
   methods: {
+    openDialog(id) {
+      if (id === null) {
+        this.resetForm();
+        this.transactionFormDialog = true;
+        return;
+      }
+      axios.get(window.django_host + `/api/transaction/${id}/`).then((response) => {
+        this.transactionForm = response.data;
+        this.transactionForm.date = this.transactionForm.date.split('T')[0].split('-').reverse().join('.');
+        this.transactionFormDialog = true;
+      });
+    },
     saveDate() {
       let day = this.date.getDate();
       if (day < 10) {
@@ -123,22 +150,58 @@ export default {
       this.transactionForm.date = `${day}.${month}.${year}`;
       this.datePickerDialog = false;
     },
+    async deleteTransaction() {
+      try {
+        await axios.delete(
+          window.django_host + `/api/transaction/${this.transactionForm.id}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            },
+          }
+        );
+        this.transactionFormDialog = false;
+        this.$emit('update-income-transactions');
+        this.$emit('update-outcome-transactions');
+        this.$emit('update-balance');
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    },
     async submitForm() {
       try {
         const formattedDate = this.transactionForm.date.split('.').reverse().join('-')
-        const response = await axios.post(
-          window.django_host + '/api/transaction/',
-          {
-            amount: this.transactionForm.amount,
-            account: this.transactionForm.account,
-            description: this.transactionForm.description,
-            type: this.type,
-            date: formattedDate,
-            user: 1, // TODO: replace with the logged-in user
-          }
-        );
+        const data = {
+          amount: this.transactionForm.amount,
+          account: this.transactionForm.account,
+          description: this.transactionForm.description,
+          type: this.type,
+          date: formattedDate,
+          user: 1, // TODO: replace with the logged-in user
+        }
+        const config = {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+        }
+
+        if (this.transactionForm.id) {
+          await axios.put(
+            window.django_host + `/api/transaction/${this.transactionForm.id}/`,
+            data,
+            config
+          );
+          this.transactionFormDialog = false;
+        } else {
+          const response = await axios.post(
+            window.django_host + '/api/transaction/',
+            data,
+            config
+          );
+        }
 
         this.transactionForm = {
+          id: null,
           amount: null,
           account: this.transactionForm.account,
           description: null,
@@ -146,28 +209,31 @@ export default {
         };
 
         if (this.type === 1) {
-          console.log('Income transaction')
           this.$emit('update-income-transactions')
         } else {
-          console.log('Outcome transaction')
           this.$emit('update-outcome-transactions');
         }
 
         this.$emit('update-balance');
-
-        console.log('Response:', response.data);
       } catch (error) {
         console.error('Error:', error);
       }
     },
+    resetForm() {
+      this.transactionForm = {
+          amount: null,
+          account: null,
+          description: null,
+          date: this.getTodayDate(),
+      };
+    },
+    getTodayDate() {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+      const yyyy = today.getFullYear();
+      return `${dd}.${mm}.${yyyy}`;
+    }
   },
-  mounted() {
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    var yyyy = today.getFullYear();
-
-    this.transactionForm.date = dd + '.' + mm + '.' + yyyy;
-  }
 };
 </script>

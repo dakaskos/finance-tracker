@@ -1,11 +1,13 @@
 <template>
   <v-card>
-    <v-toolbar>
+    <v-toolbar v-if="isLoggedIn">
       <v-toolbar-title>{{ title }}</v-toolbar-title>
       <TransactionForm
         :accounts="accounts"
         :type="type"
+        :title="title"
         class="text-right"
+        ref="transactionForm"
         @update-income-transactions="updateIncomeTransactions"
         @update-outcome-transactions="updateOutcomeTransactions"
         @update-balance="updateBalance"
@@ -32,6 +34,7 @@
       <tbody>
         <tr
           v-for="transaction in transactions"
+          @click="editTransaction(transaction.id)"
           :key="transaction.id"
           :class="currencyColor(transaction.currency)"
         >
@@ -58,8 +61,12 @@ export default {
     accounts: Array, // TODO: add type checking
     title: String,
     type: Number,
+    isLoggedIn: Boolean,
   },
   methods: {
+    editTransaction(id) {
+      this.$refs.transactionForm.openDialog(id);
+    },
     isAccountCash(transaction) {
       return transaction.is_cash === 1 ? "Наличка" : "Счет";
     },

@@ -1,8 +1,13 @@
 <template>
   <v-container>
     <v-row>
+      <LoginForm :isLoggedIn="isLoggedIn" @update-tokens="checkAccessToken" />
+    </v-row>
+  </v-container>
+  <v-container>
+    <v-row>
       <v-col cols="12">
-        <AccountForm @update-accounts="getAccounts" />
+        <AccountForm :isLoggedIn="isLoggedIn" @update-accounts="getAccounts" />
       </v-col>
     </v-row>
     <v-row>
@@ -22,6 +27,7 @@
           :transactions="incomeTransactions"
           :accounts="accounts"
           :type=1
+          :isLoggedIn="isLoggedIn"
           @update-income-transactions="getTransactions"
           @update-balance="getAccounts"
         />
@@ -32,6 +38,7 @@
           :transactions="outcomeTransactions"
           :accounts="accounts"
           :type=-1
+          :isLoggedIn="isLoggedIn"
           @update-outcome-transactions="getTransactions"
           @update-balance="getAccounts"
         />
@@ -45,9 +52,11 @@ import axios from "axios";
 import TransactionsList from "@/components/TransactionsList.vue";
 import AccountForm from "@/components/AccountForm.vue";
 import TransactionFilter from "@/components/TransactionFilter.vue";
+import LoginForm from "@/components/LoginForm.vue";
 export default {
   name: "BudgetList",
   components: {
+    LoginForm,
     TransactionFilter,
     AccountForm,
     TransactionsList,
@@ -59,6 +68,7 @@ export default {
     accounts: [],
     date_to: null,
     date_from: null,
+    isLoggedIn: false,
   }),
   mounted() {
     const today = new Date();
@@ -69,6 +79,7 @@ export default {
 
     this.getTransactions();
     this.getAccounts();
+    this.checkAccessToken();
   },
   methods: {
     updatePeriod(date_from, date_to) {
@@ -216,6 +227,9 @@ export default {
       }
 
       return "bg-grey-lighten-4";
+    },
+    checkAccessToken() {
+      this.isLoggedIn = localStorage.getItem("access_token") !== null;
     },
   },
   watch: {

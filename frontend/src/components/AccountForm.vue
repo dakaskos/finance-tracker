@@ -4,6 +4,7 @@
       color="primary"
       prepend-icon="mdi-plus"
       variant="tonal"
+      v-if="isLoggedIn"
       @click="dialog = true"
     >
       Новый счет
@@ -77,6 +78,9 @@ export default {
       (v) => (v && v >= 0) || "Amount must be greater than 0",
     ],
   }),
+  props: {
+    isLoggedIn: Boolean,
+  },
   methods: {
     async submitForm() {
       try {
@@ -87,6 +91,11 @@ export default {
               is_cash: this.accountForm.is_cash,
               balance: this.accountForm.balance,
               user: 1, // TODO: replace with the logged-in user
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+              },
             }
           );
           this.dialog = false;
