@@ -1,8 +1,10 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
 
-from ..models.transaction import Transaction
+from ..models.transaction import Transaction, TransactionType
 from ..serializers.transaction import TransactionSerializer
 
 
@@ -25,3 +27,17 @@ class TransactionViewSet(viewsets.ModelViewSet):
     ]
     filterset_class = TransactionFilter
     ordering_fields = ['date', 'id']
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        account = instance.account
+        if instance.type == TransactionType.EXPENSE.value:
+            account.balance += instance.amount
+        else:
+            account.balance -= instance.amount
+        account.save()
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
